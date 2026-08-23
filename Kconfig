@@ -4,3 +4,10 @@ menuconfig PAW3222
   select SPI
     help
       Enable PAW3222 mouse optical sensor.
+
+config PAW3222_REPORT_INTERVAL_MS
+    int "PAW3222 motion report interval in milliseconds"
+    default 15
+    range 1 100
+    help
+      Interval in milliseconds between motion reads while the sensor is active.

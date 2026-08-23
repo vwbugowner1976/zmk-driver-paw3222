@@ -282,7 +282,8 @@ static void paw32xx_motion_work_handler(struct k_work *work) {
     input_report_rel(data->dev, INPUT_REL_Y, y, true, K_FOREVER);
 
     // Schedule next check after 15ms without using interrupts
-    k_timer_start(&data->motion_timer, K_MSEC(15), K_NO_WAIT);
+    // k_timer_start(&data->motion_timer, K_MSEC(15), K_NO_WAIT);
+    k_timer_start(&data->motion_timer, K_MSEC(CONFIG_PAW3222_REPORT_INTERVAL_MS), K_NO_WAIT);
 }
 
 static void paw32xx_motion_handler(const struct device *gpio_dev, struct gpio_callback *cb,
