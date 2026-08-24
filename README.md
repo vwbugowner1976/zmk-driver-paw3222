@@ -186,3 +186,36 @@ endif
 - `irq-gpios`: モーションピンに接続されたGPIO（必須）
 - `res-cpi`: センサーのCPI解像度（任意）
 - `force-awake`: センサーを「強制起動」モードで初期化（任意、ブール値）
+
+
+## DYA Studio support
+
+DYA Studio-specific development is maintained on the `dya-studio` branch. The `main`
+branch remains the standard driver.
+
+### CPI through Custom Settings
+
+Add `zmk-feature-custom-settings` to the keyboard firmware manifest and enable:
+
+```conf
+CONFIG_ZMK_PAW3222_CUSTOM_SETTINGS=y
+```
+
+The driver registers the public Custom Settings subsystem
+`cormoran__paw3222` with the key `cpi@trackball`. The setting accepts
+608–4826 CPI. PAW3222 hardware uses 38-CPI steps, so values are applied at the
+closest supported step at or below the requested value.
+
+The generic Custom Settings Studio RPC provides read, update, save, discard,
+and reset operations. Saving persists the CPI in firmware settings storage,
+and the saved value is reapplied after boot.
+
+> DYA Studio must recognize the `cormoran__paw3222` subsystem to render a
+> dedicated PAW3222 control. Until that UI integration is available, the same
+> setting remains accessible through the generic Custom Settings protocol.
+
+### DYA version tags
+
+Verified DYA Studio milestones use tags such as `dya-v0.1.0`,
+`dya-v0.2.0`, and so on. A tag is created only after the corresponding
+feature has been implemented and tested on firmware/hardware.
