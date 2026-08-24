@@ -1,7 +1,7 @@
 
 menuconfig PAW3222
     bool "PAW3222 mouse optical sensor"
-  select SPI
+    select SPI
     help
       Enable PAW3222 mouse optical sensor.
 
@@ -11,3 +11,13 @@ config PAW3222_REPORT_INTERVAL_MS
     range 1 100
     help
       Interval in milliseconds between motion reads while the sensor is active.
+
+config ZMK_PAW3222_CUSTOM_SETTINGS
+    bool "Enable PAW3222 runtime settings for DYA Studio"
+    depends on PAW3222
+    depends on ZMK_CUSTOM_SETTINGS
+    help
+      Expose PAW3222 runtime settings through zmk-feature-custom-settings.
+      The settings are available under the "cormoran__paw3222" subsystem,
+      can be changed through Studio RPC, and are persisted by the custom
+      settings module.
