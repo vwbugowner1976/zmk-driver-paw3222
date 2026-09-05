@@ -59,7 +59,7 @@ LOG_MODULE_REGISTER(paw32xx, CONFIG_ZMK_LOG_LEVEL);
 #define MOUSE_OPTION_MOVX_INV_BIT 3
 #define MOUSE_OPTION_MOVY_INV_BIT 4
 
-#define PAW32XX_DATA_SIZE_BITS 8
+#define PAW32XX_DATA_SIZE_BITS 12
 
 #define RESET_DELAY_MS 2
 
@@ -191,13 +191,17 @@ static int paw32xx_read_xy(const struct device *dev, int16_t *x, int16_t *y) {
         0xff,
         PAW32XX_DELTA_Y,
         0xff,
+        PAW32XX_DELTA_XY_HI,
+        0xff,
     };
+
     uint8_t rx_data[sizeof(tx_data)];
 
     const struct spi_buf tx_buf = {
         .buf = tx_data,
         .len = sizeof(tx_data),
     };
+
     const struct spi_buf_set tx = {
         .buffers = &tx_buf,
         .count = 1,
@@ -207,6 +211,7 @@ static int paw32xx_read_xy(const struct device *dev, int16_t *x, int16_t *y) {
         .buf = rx_data,
         .len = sizeof(rx_data),
     };
+
     const struct spi_buf_set rx = {
         .buffers = &rx_buf,
         .count = 1,
@@ -217,8 +222,15 @@ static int paw32xx_read_xy(const struct device *dev, int16_t *x, int16_t *y) {
         return ret;
     }
 
-    *x = rx_data[1];
-    *y = rx_data[3];
+    /*
+     * DELTA_XY_HI:
+     *   lower nibble = X[11:8]
+     *   upper nibble = Y[11:8]
+     *
+     * Zephyr upstream PAW32xx implementationと同じ再構成。
+     */
+    *x = ((rx_data[5] << 4) & 0x0f00) | rx_data[1];
+    *y = ((rx_data[5] << 8) & 0x0f00) | rx_data[3];
 
     *x = _sign_extend(*x, PAW32XX_DATA_SIZE_BITS - 1);
     *y = _sign_extend(*y, PAW32XX_DATA_SIZE_BITS - 1);
